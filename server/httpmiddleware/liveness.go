@@ -3,7 +3,7 @@ package httpmiddleware
 import (
 	"net/http"
 
-	"github.com/boypt/simple-torrent/common"
+	"github.com/makrron/simple-torrent/common"
 )
 
 func Liveness(h http.Handler) http.Handler {

@@ -2,12 +2,23 @@ package server
 
 import (
 	"bytes"
+	"crypto/tls"
 	_ "embed"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
+
+func init() {
+	if tr, ok := http.DefaultTransport.(*http.Transport); ok {
+		if tr.TLSClientConfig == nil {
+			tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		} else {
+			tr.TLSClientConfig.InsecureSkipVerify = true
+		}
+	}
+}
 
 //go:embed default-scraper-config.json
 var defaultSearchConfig []byte

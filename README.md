@@ -1,24 +1,24 @@
 ![screenshot](https://user-images.githubusercontent.com/1033514/64239393-bdbb6480-cf32-11e9-9269-d8d10e7c0dc7.png)
 
-![Build Status](https://github.com/boypt/simple-torrent/workflows/Go/badge.svg) 
+![Build Status](https://github.com/makrron/simple-torrent/workflows/Docker%20Build%20%26%20Push/badge.svg) 
 
-**SimpleTorrent** is a a self-hosted remote torrent client, written in Go (golang). Started torrents remotely, download sets of files on the local disk of the server, which are then retrievable or streamable via HTTP.
+**SimpleTorrent** is a self-hosted remote torrent client, written in Go (golang). Start torrents remotely and download sets of files on the local disk of the server, which are then retrievable or streamable via HTTP.
 
-This project is a re-branded fork of [cloud-torrent](https://github.com/jpillora/cloud-torrent) by `jpillora`.
+Maintained by **[@makrron](https://github.com/makrron)**. Originally based on [cloud-torrent](https://github.com/jpillora/cloud-torrent) by `jpillora` and `boypt`.
 
 # Features
 
-* Individual file download control (1.1.3+)
+* Individual file download control
 * Run external program on tasks completion: `DoneCmd`
 * Stops task when seeding ratio reached: `SeedRatio`
 * Download/Upload speed limiter: `UploadRate`/`DownloadRate`
 * Detailed transfer stats in web UI.
-* [Torrent Watcher](https://github.com/boypt/simple-torrent/wiki/Torrent-Watcher)
+* Torrent Watcher
 * K8s/docker health-check endpoint `/healthz`
 * Extra trackers from external source
-* Protocol Handler to `magnet:`
+* Protocol Handler for `magnet:`
 * Magnet RSS subscribing supported
-* Flexible config file accepts multiple formats (.json/.yaml/.toml) ([by spf13/Viper](https://github.com/spf13/viper/)) (1.2.0+)
+* Flexible config file accepts multiple formats (.json/.yaml/.toml via Viper)
 
 Also:
 * Single binary
@@ -26,62 +26,58 @@ Also:
 * Embedded torrent search
 * Real-time updates
 * Mobile-friendly
-* Fast [content server](http://golang.org/pkg/net/http/#ServeContent)
+* Fast content server
 * IPv6 out of the box
-* Updated torrent engine from [anacrolix/torrent](https://github.com/anacrolix/torrent)
+* Updated torrent engine built on `anacrolix/torrent`
 
 # Install
 
 ## Binary
 
-See [the latest release](https://github.com/boypt/cloud-torrent/releases/latest) or use the oneline script to do a quick install on a modern Linux machines.
+See [the latest release](https://github.com/makrron/simple-torrent/releases/latest).
 
-``` bash
-bash <(wget -qO- https://git.io/simpletorrentqs)
+## Docker
+
+```bash
+docker run -d -p 3000:3000 -p 50007:50007 -p 50007:50007/udp -v /path/to/my/downloads:/srv/downloads -v /path/to/my/torrents:/srv/torrents makrron/simple-torrent:latest
 ```
 
-The script installs a systemd unit (under `scripts/cloud-torrent.service`) as service. Read further intructions: [Auth And Security](https://github.com/boypt/simple-torrent/wiki/AuthSecurity)
-
-If hope to specify a version, just append the version number to the command.
-
-``` bash
-bash <(wget -qO- https://git.io/simpletorrentqs) 1.3.3
-```
-
-## Docker [![Docker Pulls](https://img.shields.io/docker/pulls/boypt/cloud-torrent.svg)][dockerhub]
-
-[dockerhub]: https://hub.docker.com/r/boypt/cloud-torrent/
-
-``` bash
-$ docker run -d -p 3000:3000 -v /path/to/my/downloads:/downloads -v /path/to/my/torrents:/torrents boypt/cloud-torrent
-```
 When running as a container, keep in mind:
-* You need also to expose your torrent incoming port (50007 by default) if you want to seed (`-p 50007:50007`). Also, you'll have to forward the port on your router.
+* You need to expose your torrent incoming port (50007 by default) if you want to seed (`-p 50007:50007`). Also, forward the port on your router.
 * Automatic port forwarding on your router via UPnP IGD will not work unless run in `host` mode (`--net=host`).
 
-It's more practical to run docker-compose, see Wiki Page: [DockerCompose](https://github.com/boypt/simple-torrent/wiki/DockerCompose)
-## Source
+It's recommended to run via Docker Compose:
 
-**Requirement**
-- Latest [Golang](https://golang.org/dl/) (Go 1.16+)
+```yaml
+version: '3.8'
 
-``` sh
-$ git clone https://github.com/boypt/simple-torrent.git
-$ cd simple-torrent
-$ ./scripts/make_release.sh
+services:
+  simple-torrent:
+    image: makrron/simple-torrent:latest
+    container_name: simple-torrent
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "50007:50007"
+      - "50007:50007/udp"
+    volumes:
+      - ./downloads:/srv/downloads
+      - ./torrents:/srv/torrents
 ```
 
-# Usage
+## Source Build
 
-## Commandline Options
-See Wiki [Command line Options](https://github.com/boypt/simple-torrent/wiki/Command-line-Options)
+**Requirement**
+- Golang (Go 1.18+)
 
-## Configuration file
-See Wiki [Config File](https://github.com/boypt/simple-torrent/wiki/Config-File)
-
-## Use with WEB servers (nginx/caddy)
-See Wiki [Behind WebServer (reverse proxying)](https://github.com/boypt/simple-torrent/wiki/ReverseProxy)
+```bash
+$ git clone https://github.com/makrron/simple-torrent.git
+$ cd simple-torrent
+$ CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.VERSION=$(git describe --tags)" -o simple-torrent
+```
 
 # Credits 
-* Credits to @jpillora for [Cloud Torrent](https://github.com/jpillora/cloud-torrent).
-* Credits to @anacrolix for https://github.com/anacrolix/torrent
+* Maintained by [@makrron](https://github.com/makrron)
+* Credits to @boypt for original SimpleTorrent.
+* Credits to @jpillora for Cloud Torrent.
+* Credits to @anacrolix for torrent engine.

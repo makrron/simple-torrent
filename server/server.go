@@ -13,19 +13,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/boypt/simple-torrent/common"
-	"github.com/boypt/simple-torrent/server/httpmiddleware"
-
 	"errors"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/anacrolix/torrent"
 	"github.com/boypt/scraper"
-	"github.com/boypt/simple-torrent/engine"
-	ctstatic "github.com/boypt/simple-torrent/static"
 	"github.com/jpillora/cookieauth"
 	"github.com/jpillora/requestlog"
 	"github.com/jpillora/velox"
+	"github.com/makrron/simple-torrent/common"
+	"github.com/makrron/simple-torrent/engine"
+	"github.com/makrron/simple-torrent/server/httpmiddleware"
+	ctstatic "github.com/makrron/simple-torrent/static"
 	"github.com/mmcdole/gofeed"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/viper"

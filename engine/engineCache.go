@@ -11,7 +11,7 @@ import (
 
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
-	"github.com/boypt/simple-torrent/common"
+	"github.com/makrron/simple-torrent/common"
 )
 
 const (

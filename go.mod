@@ -1,4 +1,4 @@
-module github.com/boypt/simple-torrent
+module github.com/makrron/simple-torrent
 
 go 1.17
 

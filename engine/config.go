@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/boypt/simple-torrent/common"
+	"github.com/makrron/simple-torrent/common"
 	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"gopkg.in/yaml.v2"
