@@ -222,5 +222,27 @@
       "seeds": "td:nth-child(6)",
       "peers": "td:nth-child(7)"
     }
+  },
+  "yts": {
+    "name": "YTS (YIFY)",
+    "url": "https://en.yts-official.biz/browse-movies/{{query}}?page={{page:1}}",
+    "list": "div.browse-movie-wrap",
+    "result": {
+      "name": "a.browse-movie-title",
+      "url": [
+        "a.browse-movie-title",
+        "@href"
+      ]
+    }
+  },
+  "yts/item": {
+    "name": "YTS (YIFY Item)",
+    "url": "https://en.yts-official.biz{{item}}",
+    "result": {
+      "magnet": [
+        "a[href^='magnet:']",
+        "@href"
+      ]
+    }
   }
 }
