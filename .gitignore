@@ -9,4 +9,5 @@ play*.yml
 .torrent.bolt.db
 
 MEMORY.md
+AGENTS.md
 .agents/*
