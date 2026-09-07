@@ -225,7 +225,8 @@ app.controller("OmniController", function (
       api.magnet(result.magnet);
       return;
     } else if (result.infohash) {
-      api.magnet(magnetURI(result.name, result.infohash, parseTrackers(result))).then(reqinfo);
+      var magnetStr = "magnet:?xt=urn:btih:" + result.infohash + (result.name ? "&dn=" + encodeURIComponent(result.name) : "");
+      api.magnet(magnetStr).then(reqinfo);
       return;
     } else if (result.torrent) {
       api.url(result.torrent).then(reqinfo);
