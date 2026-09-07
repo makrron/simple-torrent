@@ -23,12 +23,19 @@ Maintained by **[@makrron](https://github.com/makrron)**. Originally based on [c
 Also:
 * Single binary
 * Cross platform
-* Embedded torrent search
+* **Modular Torrent Search Engine** (HTML scraping + JSON APIs, mirror failover, easily extensible)
 * Real-time updates
 * Mobile-friendly
 * Fast content server
 * IPv6 out of the box
 * Updated torrent engine built on `anacrolix/torrent`
+
+## 🔍 Torrent Search Engine
+SimpleTorrent includes a modular search engine with built-in support for popular torrent indexes (The Pirate Bay, YTS, 1337X, Nyaa, EZTV, LimeTorrents, TorrentGalaxy, AudiobookBay).
+
+* **Extensible**: Add new search sites by simply adding a JSON file in `search/providers/`.
+* **Community Driven**: Request new sites or report issues via [GitHub Issue Templates](https://github.com/makrron/simple-torrent/issues/new/choose).
+* **Documentation**: See [`docs/SEARCH_PROVIDERS.md`](docs/SEARCH_PROVIDERS.md) for architecture, schema details, and extension tutorials.
 
 # Install
 
