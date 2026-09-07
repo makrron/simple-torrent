@@ -1,0 +1,47 @@
+{
+  "id": "torrentgalaxy",
+  "name": "TorrentGalaxy",
+  "type": "html",
+  "url": "https://torrentgalaxy.one/torrents.php?search={{query}}&sort=id&order=desc&page={{page:0}}",
+  "mirrors": [
+    "https://torrentgalaxy.one/torrents.php?search={{query}}&sort=id&order=desc&page={{page:0}}",
+    "https://torrentgalaxy.to/torrents.php?search={{query}}&sort=id&order=desc&page={{page:0}}"
+  ],
+  "list": "div.tgxtablerow",
+  "result": {
+    "name": [
+      "a.txlight",
+      "@title"
+    ],
+    "url": [
+      "div.clickable-row a.txlight",
+      "@href"
+    ],
+    "path": [
+      "div.clickable-row a.txlight",
+      "@href"
+    ],
+    "size": "span.badge-secondary",
+    "seeds": "font[color='green'] b",
+    "peers": "font[color='#ff0000'] b",
+    "magnet": [
+      "a[href^='magnet:']",
+      "@href"
+    ],
+    "torrent": [
+      "a[href$='.torrent']",
+      "@href"
+    ]
+  },
+  "item_url": "https://torrentgalaxy.one{{item}}",
+  "item_mirrors": [
+    "https://torrentgalaxy.one{{item}}",
+    "https://torrentgalaxy.to{{item}}"
+  ],
+  "item_result": {
+    "magnet": [
+      "a[href^='magnet:']",
+      "@href"
+    ]
+  }
+}

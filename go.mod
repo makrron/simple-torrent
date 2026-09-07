@@ -9,7 +9,6 @@ require (
 	github.com/anacrolix/log v0.10.0
 	github.com/anacrolix/torrent v1.39.2-0.20211223013416-b831060d6eb8
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2 // indirect
-	github.com/boypt/scraper v1.0.3
 	github.com/c2h5oh/datasize v0.0.0-20200825124411-48ed595a09d2
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elithrar/simple-scrypt v1.3.0 // indirect
@@ -40,8 +39,9 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
+require github.com/PuerkitoBio/goquery v1.5.1
+
 require (
-	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/anacrolix/chansync v0.3.0 // indirect
 	github.com/anacrolix/confluence v1.9.0 // indirect
@@ -109,9 +109,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	github.com/tidwall/gjson v1.3.2 // indirect
-	github.com/tidwall/match v1.0.1 // indirect
-	github.com/tidwall/pretty v1.0.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect

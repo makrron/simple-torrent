@@ -75,7 +75,7 @@ func (s *Server) apiGET(w http.ResponseWriter, r *http.Request) error {
 		s.state.Stats.ConnStat = s.engine.ConnStat()
 		common.HandleError(json.NewEncoder(w).Encode(s.state.Stats))
 	case "searchproviders":
-		common.HandleError(json.NewEncoder(w).Encode(s.searchProviders))
+		common.HandleError(json.NewEncoder(w).Encode(s.searchEngine.ProvidersMap()))
 	case "enginedebug":
 		w.Header().Set("Content-Type", "application/json")
 		var buf bytes.Buffer

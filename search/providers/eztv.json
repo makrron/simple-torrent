@@ -1,0 +1,29 @@
+{
+  "id": "eztv",
+  "name": "EZTV",
+  "type": "html",
+  "url": "https://eztv.re/search/{{query}}",
+  "mirrors": [
+    "https://eztv.re/search/{{query}}",
+    "https://eztv1.xyz/search/{{query}}",
+    "https://eztv.wf/search/{{query}}"
+  ],
+  "list": "tr.forum_header_border",
+  "result": {
+    "name": "td:nth-child(2) a.epinfo",
+    "url": [
+      "td:nth-child(2) a.epinfo",
+      "@href"
+    ],
+    "magnet": [
+      "td:nth-child(3) a.magnet",
+      "@href"
+    ],
+    "torrent": [
+      "td:nth-child(3) a.download_1",
+      "@href"
+    ],
+    "size": "td:nth-child(4)",
+    "seeds": "td:nth-child(6)"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "tpb",
+  "name": "The Pirate Bay",
+  "type": "html",
+  "url": "https://tpb.party/search/{{query}}/{{page:1}}/7/0",
+  "mirrors": [
+    "https://tpb.party/search/{{query}}/{{page:1}}/7/0",
+    "https://thepiratebay0.org/search/{{query}}/{{page:1}}/7/0",
+    "https://pirateproxy.live/search/{{query}}/{{page:1}}/7/0"
+  ],
+  "list": "#searchResult > tbody > tr",
+  "result": {
+    "name": [
+      "td:nth-child(2) a",
+      "a.detLink",
+      "div.detName a"
+    ],
+    "path": [
+      "td:nth-child(2) a",
+      "@href"
+    ],
+    "magnet": [
+      "a[href^='magnet:']",
+      "@href"
+    ],
+    "size": [
+      "td:nth-child(5)",
+      "font.detDesc",
+      "/Size ([^,]+)/"
+    ],
+    "seeds": [
+      "td:nth-child(6)",
+      "td:nth-child(3)"
+    ],
+    "peers": [
+      "td:nth-child(7)",
+      "td:nth-child(4)"
+    ]
+  }
+}
