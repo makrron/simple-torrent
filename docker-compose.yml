@@ -16,7 +16,5 @@ services:
       - AUTH=username:password
       - TITLE=SimpleTorrent
     volumes:
-      - ./downloads:/srv/downloads
-      - ./torrents:/srv/torrents
-      - ./cloud-torrent.yaml:/etc/cloud-torrent.yaml
-    command: ["-c", "/etc/cloud-torrent.yaml"]
+      - ./downloads:/downloads
+      - ./torrents:/torrents

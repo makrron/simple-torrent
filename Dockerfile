@@ -24,8 +24,18 @@ FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates tzdata
 
+# Create default directories for downloads and torrent watcher
+RUN mkdir -p /downloads /torrents
+
 COPY --from=builder /usr/local/bin/cloud-torrent /usr/local/bin/cloud-torrent
+RUN ln -s /usr/local/bin/cloud-torrent /usr/local/bin/simple-torrent
+
+VOLUME ["/downloads", "/torrents"]
 
 EXPOSE 3000 50007 50007/udp
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+
 ENTRYPOINT ["cloud-torrent"]
+

@@ -1,0 +1,44 @@
+name: CI & Tests
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - 'fix/**'
+      - 'feat/**'
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests & Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Code Verification (go vet)
+        run: go vet ./...
+
+      - name: Run Unit Tests
+        run: go test -v -cover ./...
+
+      - name: Verify Clean Cross-Compile (Linux amd64 & arm64)
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o /dev/null .
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -o /dev/null .
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -o /dev/null .
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath -o /dev/null .

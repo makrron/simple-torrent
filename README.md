@@ -46,11 +46,15 @@ See [the latest release](https://github.com/makrron/simple-torrent/releases/late
 ## Docker
 
 ```bash
-docker run -d -p 3000:3000 -p 50007:50007 -p 50007:50007/udp -v /path/to/my/downloads:/srv/downloads -v /path/to/my/torrents:/srv/torrents makrron/simple-torrent:latest
+docker run -d \
+  -p 3000:3000 \
+  -v /path/to/my/downloads:/downloads \
+  -v /path/to/my/torrents:/torrents \
+  makrron/simple-torrent:latest
 ```
 
 When running as a container, keep in mind:
-* You need to expose your torrent incoming port (50007 by default) if you want to seed (`-p 50007:50007`). Also, forward the port on your router.
+* You can optionally expose your torrent incoming port (50007 by default) if you want to seed: `-p 50007:50007 -p 50007:50007/udp`.
 * Automatic port forwarding on your router via UPnP IGD will not work unless run in `host` mode (`--net=host`).
 
 It's recommended to run via Docker Compose:
@@ -68,8 +72,8 @@ services:
       - "50007:50007"
       - "50007:50007/udp"
     volumes:
-      - ./downloads:/srv/downloads
-      - ./torrents:/srv/torrents
+      - ./downloads:/downloads
+      - ./torrents:/torrents
 ```
 
 ## Source Build

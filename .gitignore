@@ -11,3 +11,4 @@ play*.yml
 MEMORY.md
 AGENTS.md
 .agents/*
+dist/
