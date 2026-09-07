@@ -74,9 +74,8 @@ build_all() {
     build_target "darwin" "amd64" ""
     build_target "darwin" "arm64" ""
 
-    # Windows
+    # Windows (x64)
     build_target "windows" "amd64" ""
-    build_target "windows" "386" ""
 
     echo "==> Generating SHA256 checksums..."
     (
