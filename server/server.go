@@ -17,12 +17,12 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/anacrolix/torrent"
-	"github.com/boypt/scraper"
 	"github.com/jpillora/cookieauth"
 	"github.com/jpillora/requestlog"
 	"github.com/jpillora/velox"
 	"github.com/makrron/simple-torrent/common"
 	"github.com/makrron/simple-torrent/engine"
+	"github.com/makrron/simple-torrent/search"
 	"github.com/makrron/simple-torrent/server/httpmiddleware"
 	ctstatic "github.com/makrron/simple-torrent/static"
 	"github.com/mmcdole/gofeed"
@@ -30,9 +30,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	scraperUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
-)
 
 var (
 	isListenOnUnix bool
@@ -66,7 +63,7 @@ type Server struct {
 
 	//http handlers
 	scraperh, dlfilesh, statich, verStatich, rssh http.Handler
-	scraper                                       *scraper.Handler
+	searchEngine                                  *search.Engine
 
 	//torrent engine
 	engine *engine.Engine
@@ -88,11 +85,10 @@ type Server struct {
 		}
 	}
 
-	rssMark         map[string]string
-	rssCache        []*gofeed.Item
-	searchProviders *scraper.Config
-	engineConfig    *engine.Config
-	tpl             *TPLInfo
+	rssMark      map[string]string
+	rssCache     []*gofeed.Item
+	engineConfig *engine.Config
+	tpl          *TPLInfo
 }
 
 // Run the server
@@ -134,19 +130,12 @@ func (s *Server) Run(tpl *TPLInfo) error {
 	s.dlfilesh = http.StripPrefix("/download/", http.HandlerFunc(s.serveDownloadFiles))
 	s.rssh = http.HandlerFunc(s.serveRSS)
 
-	//scraper
-	s.scraper = &scraper.Handler{
-		Log: s.Debug, Debug: s.Debug,
-		Headers: map[string]string{
-			//we're a trusty browser :)
-			"User-Agent": scraperUA,
-		},
-	}
-	if err := s.scraper.LoadConfig(defaultSearchConfig); err != nil {
-		log.Fatal(err)
-	}
-	s.searchProviders = &s.scraper.Config //share scraper config with web frontend
-	s.scraperh = http.StripPrefix("/search", s.scraper)
+	//search engine
+	s.searchEngine = search.NewEngine(search.EngineOptions{
+		ProxyURL: s.ProxyURL,
+		Debug:    s.Debug,
+	})
+	s.scraperh = http.StripPrefix("/search", s.searchEngine)
 
 	// sync config from cmd arg to viper
 	viper.SetDefault("ProxyURL", s.ProxyURL)

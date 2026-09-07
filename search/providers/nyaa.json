@@ -1,0 +1,31 @@
+{
+  "id": "nyaa",
+  "name": "Nyaa",
+  "type": "html",
+  "url": "https://nyaa.si/?f=0&c=0_0&s=seeders&o=desc&q={{query}}&p={{page:1}}",
+  "mirrors": [
+    "https://nyaa.si/?f=0&c=0_0&s=seeders&o=desc&q={{query}}&p={{page:1}}",
+    "https://nyaa.net/?f=0&c=0_0&s=seeders&o=desc&q={{query}}&p={{page:1}}"
+  ],
+  "list": "table.torrent-list > tbody > tr",
+  "result": {
+    "name": [
+      "td:nth-child(2) a:not(.comments)"
+    ],
+    "path": [
+      "td:nth-child(2) a:not(.comments)",
+      "@href"
+    ],
+    "magnet": [
+      "a[href^='magnet:']",
+      "@href"
+    ],
+    "torrent": [
+      "a[href$='.torrent']",
+      "@href"
+    ],
+    "size": "td:nth-child(4)",
+    "seeds": "td:nth-child(6)",
+    "peers": "td:nth-child(7)"
+  }
+}

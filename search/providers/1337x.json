@@ -1,0 +1,40 @@
+{
+  "id": "1337x",
+  "name": "1337X",
+  "type": "html",
+  "url": "https://1337xx.to/sort-search/{{query}}/seeders/desc/{{page:1}}/",
+  "mirrors": [
+    "https://1337xx.to/sort-search/{{query}}/seeders/desc/{{page:1}}/",
+    "https://1337x.mrunblock.guru/sort-search/{{query}}/seeders/desc/{{page:1}}/",
+    "https://1337x.to/sort-search/{{query}}/seeders/desc/{{page:1}}/"
+  ],
+  "list": "table.table-list tbody tr, .box-info-detail table.table tr",
+  "result": {
+    "name": [
+      ".coll-1 a:nth-child(2)",
+      ".coll-1 a"
+    ],
+    "path": [
+      ".coll-1 a:nth-child(2)",
+      "@href"
+    ],
+    "seeds": ".coll-2",
+    "peers": ".coll-3",
+    "size": [
+      ".coll-4",
+      "/([\\d\\.]+ [KMGT]?B)/"
+    ]
+  },
+  "item_url": "https://1337xx.to{{item}}",
+  "item_mirrors": [
+    "https://1337xx.to{{item}}",
+    "https://1337x.mrunblock.guru{{item}}",
+    "https://1337x.to{{item}}"
+  ],
+  "item_result": {
+    "magnet": [
+      "a[href^='magnet:']",
+      "@href"
+    ]
+  }
+}

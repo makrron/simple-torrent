@@ -1,0 +1,37 @@
+{
+  "id": "lt",
+  "name": "LimeTorrents",
+  "type": "html",
+  "url": "https://www.limetorrents.cc/search/all/{{query}}/seeds/{{page:1}}/",
+  "mirrors": [
+    "https://www.limetorrents.cc/search/all/{{query}}/seeds/{{page:1}}/",
+    "https://www.limetorrents.lol/search/all/{{query}}/seeds/{{page:1}}/",
+    "https://limetorrents.to/search/all/{{query}}/seeds/{{page:1}}/"
+  ],
+  "list": ".table2 tbody tr:nth-child(n+2)",
+  "result": {
+    "name": [
+      ".tt-name a:nth-child(2)",
+      ".tt-name a"
+    ],
+    "path": [
+      ".tt-name a:nth-child(2)",
+      "@href"
+    ],
+    "size": "td:nth-child(3)",
+    "seeds": "td:nth-child(4)",
+    "peers": "td:nth-child(5)"
+  },
+  "item_url": "https://www.limetorrents.cc{{item}}",
+  "item_mirrors": [
+    "https://www.limetorrents.cc{{item}}",
+    "https://www.limetorrents.lol{{item}}"
+  ],
+  "item_result": {
+    "magnet": [
+      "a.csprite_dltorrent[href^='magnet:']",
+      "a[href^='magnet:']",
+      "@href"
+    ]
+  }
+}

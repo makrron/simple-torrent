@@ -1,0 +1,31 @@
+{
+  "id": "yts",
+  "name": "YTS (YIFY)",
+  "type": "html",
+  "url": "https://en.yts-official.biz/browse-movies/{{query}}?page={{page:1}}",
+  "mirrors": [
+    "https://en.yts-official.biz/browse-movies/{{query}}?page={{page:1}}"
+  ],
+  "list": "div.browse-movie-wrap",
+  "result": {
+    "name": "a.browse-movie-title",
+    "path": [
+      "a.browse-movie-title",
+      "@href"
+    ],
+    "url": [
+      "a.browse-movie-title",
+      "@href"
+    ]
+  },
+  "item_url": "https://en.yts-official.biz{{item}}",
+  "item_mirrors": [
+    "https://en.yts-official.biz{{item}}"
+  ],
+  "item_result": {
+    "magnet": [
+      "a[href^='magnet:']",
+      "@href"
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+name: "Report Broken Search Provider"
+description: "Report a torrent provider that returns 0 results, HTTP 403, or failed parsing"
+title: "[Broken Provider]: <Provider Name>"
+labels: ["search-provider", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please report issues with built-in torrent search providers (e.g., Cloudflare blocking, domain changes, HTML table layout updates).
+
+  - type: dropdown
+    id: provider_id
+    attributes:
+      label: "Affected Search Provider"
+      description: "Select the search provider that is currently failing."
+      options:
+        - "The Pirate Bay (tpb)"
+        - "YTS (yts)"
+        - "1337X (1337x)"
+        - "Nyaa (nyaa)"
+        - "EZTV (eztv)"
+        - "LimeTorrents (lt)"
+        - "AudiobookBay (abb)"
+        - "TorrentGalaxy (torrentgalaxy)"
+        - "Other (Specify below)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: failure_type
+    attributes:
+      label: "Type of Failure"
+      options:
+        - "HTTP 403 Forbidden / Cloudflare challenge"
+        - "Timeout / Domain unreachable"
+        - "Returns 0 results for common queries"
+        - "Magnet link not found on detail page"
+        - "Invalid sizes, seeds, or peers"
+    validations:
+      required: true
+
+  - type: input
+    id: sample_query
+    attributes:
+      label: "Sample Search Query"
+      description: "What query did you search for when the error occurred?"
+      placeholder: "e.g., Ubuntu, Matrix, Blender"
+    validations:
+      required: true
+
+  - type: textarea
+    id: working_mirrors
+    attributes:
+      label: "Working Mirrors or Alternative Domains"
+      description: "Do you know of any active mirror domains that currently work for this site?"
+      placeholder: "https://working-mirror.example.org"
+    validations:
+      required: false

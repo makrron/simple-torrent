@@ -1,0 +1,31 @@
+{
+  "id": "abb",
+  "name": "The Audiobook Bay",
+  "type": "html",
+  "url": "https://audiobookbay.is/page/{{page:1}}?s={{query}}",
+  "mirrors": [
+    "https://audiobookbay.is/page/{{page:1}}?s={{query}}",
+    "https://audiobookbay.lu/page/{{page:1}}?s={{query}}"
+  ],
+  "list": "#content > .post",
+  "result": {
+    "name": "div.postTitle > h2 > a",
+    "path": [
+      "div.postTitle > h2 > a",
+      "@href"
+    ],
+    "size": [
+      "div.postContent",
+      "/File Size: ([\\d\\.]+ [KMGT]?B)/"
+    ]
+  },
+  "item_url": "https://audiobookbay.is{{item}}",
+  "item_mirrors": [
+    "https://audiobookbay.is{{item}}",
+    "https://audiobookbay.lu{{item}}"
+  ],
+  "item_result": {
+    "infohash": "/td>([a-f0-9]+)</",
+    "tracker": "table.torrent_info tr:nth-child(1) td:nth-child(2)"
+  }
+}

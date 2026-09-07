@@ -1,0 +1,84 @@
+name: "Request New Torrent Search Provider"
+description: "Suggest a new torrent indexing site or API to be added to SimpleTorrent's search engine"
+title: "[Provider Request]: <Site Name>"
+labels: ["search-provider", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new torrent search provider for **SimpleTorrent**!
+        Please provide as much information as possible to help us implement and verify it.
+
+  - type: input
+    id: site_name
+    attributes:
+      label: "Site Name"
+      description: "The name of the torrent search index or provider."
+      placeholder: "e.g., TorrentProject, Rutracker, LimeTorrents"
+    validations:
+      required: true
+
+  - type: input
+    id: site_url
+    attributes:
+      label: "Primary Site URL"
+      description: "Official web address or primary domain of the site."
+      placeholder: "https://example.com"
+    validations:
+      required: true
+
+  - type: textarea
+    id: site_mirrors
+    attributes:
+      label: "Alternative Domains / Mirrors"
+      description: "List any working proxy domains or fallback mirrors (one per line)."
+      placeholder: |
+        https://mirror1.example.to
+        https://mirror2.example.is
+    validations:
+      required: false
+
+  - type: dropdown
+    id: provider_type
+    attributes:
+      label: "Provider Type"
+      description: "Does the site provide a JSON API, standard RSS feed, or HTML web pages?"
+      options:
+        - "HTML Web Scraping"
+        - "JSON REST API"
+        - "RSS / Torznab Feed"
+        - "Not Sure"
+    validations:
+      required: true
+
+  - type: input
+    id: search_url_pattern
+    attributes:
+      label: "Search URL Structure"
+      description: "What does the search URL look like? Use {{query}} and {{page}} placeholders if known."
+      placeholder: "https://example.com/search?q={{query}}&page={{page:1}}"
+    validations:
+      required: false
+
+  - type: textarea
+    id: selectors_or_api
+    attributes:
+      label: "HTML Selectors or API Details"
+      description: "If you know CSS selectors or API endpoints (e.g. table rows, title, magnet link), provide them here."
+      placeholder: |
+        Row selector: table#results > tbody > tr
+        Title selector: td.title a
+        Magnet selector: a[href^='magnet:']@href
+        Size selector: td.size
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: protection_check
+    attributes:
+      label: "Anti-bot & Cloudflare Protection"
+      description: "Check any applicable conditions."
+      options:
+        - label: "Site works directly in standard browsers without Cloudflare Turnstile / JS challenges"
+        - label: "Site provides direct magnet links or .torrent download links"
+        - label: "Site does NOT require login or private account credentials"

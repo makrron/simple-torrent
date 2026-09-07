@@ -89,7 +89,8 @@
     <table class="ui unstackable compact striped tcld very basic table">
       <tr ng-repeat="r in results">
         <td class="name">
-          <a ng-href="{{ r.url }}" target="_blank">{{ r.name }}</a>
+          <a ng-if="r.url" ng-href="{{ r.url }}" target="_blank">{{ r.name }}</a>
+          <span ng-if="!r.url">{{ r.name }}</span>
         </td>
         <td class="size" ng-if="r.size">{{ r.size }}</td>
         <td class="users">
