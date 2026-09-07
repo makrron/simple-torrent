@@ -1,7 +1,11 @@
 ############################
 # STEP 1 build executable binary
 ############################
-FROM golang:1.22-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.22-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
 
 RUN apk add --no-cache git make build-base
 
@@ -14,8 +18,11 @@ RUN go mod download
 # Copy source files
 COPY . .
 
-# Build executable binary with CGO disabled (Pure Go)
-RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.VERSION=$(git describe --tags 2>/dev/null || echo 'v1.4.0-dev')" -o /usr/local/bin/cloud-torrent
+# Build executable binary using Go native cross-compilation (blazing fast, zero QEMU emulation overhead)
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GOARM=${TARGETVARIANT#v} \
+    go build -trimpath \
+    -ldflags "-s -w -X main.VERSION=$(git describe --tags 2>/dev/null || echo 'v1.4.0-dev')" \
+    -o /usr/local/bin/cloud-torrent
 
 ############################
 # STEP 2 build lightweight final image
