@@ -1,0 +1,41 @@
+# Version control & repository metadata
+.git
+.gitignore
+.gitmodules
+.github
+.agents
+AGENTS.md
+MEMORY.md
+
+# Documentation & scripts not needed in build
+docs
+scripts
+
+# Build outputs & artifacts
+dist
+downloads
+torrents
+
+# Temporary files, caches & editor configs
+*.log
+*.tmp
+tmp/
+.vscode
+.idea
+
+# Secrets, certificates, keys & environment files
+*.env
+*.env.*
+*.key
+*.pem
+*.pfx
+*.p12
+*.crt
+*.id_rsa
+*.id_ed25519
+credentials*
+secrets*
+
+# Databases
+*.db
+*.bolt.db

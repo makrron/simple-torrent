@@ -12,3 +12,16 @@ MEMORY.md
 AGENTS.md
 .agents/*
 dist/
+
+# Secret, key and credential patterns
+*.env
+*.env.*
+*.key
+*.pem
+*.pfx
+*.p12
+*.crt
+*.id_rsa
+*.id_ed25519
+credentials*
+secrets*
