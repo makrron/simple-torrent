@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: simple-torrent:latest
+    image: makrron/simple-torrent:latest
     container_name: simple-torrent
     restart: unless-stopped
     ports:
