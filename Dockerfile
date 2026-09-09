@@ -21,7 +21,7 @@ COPY . .
 # Build executable binary using Go native cross-compilation (blazing fast, zero QEMU emulation overhead)
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GOARM=${TARGETVARIANT#v} \
     go build -trimpath \
-    -ldflags "-s -w -X main.VERSION=$(git describe --tags 2>/dev/null || echo 'v1.4.0-dev')" \
+    -ldflags "-s -w -X main.VERSION=$(git describe --tags 2>/dev/null || echo 'v1.4.1-dev')" \
     -o /usr/local/bin/cloud-torrent
 
 ############################

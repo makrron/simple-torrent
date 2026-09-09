@@ -4,7 +4,7 @@ set -e
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(cd "${__dir}/.." && pwd)"
 
-GITVER=$(git describe --tags 2>/dev/null || echo "${GITHUB_REF_NAME:-v1.4.0}")
+GITVER=$(git describe --tags 2>/dev/null || echo "${GITHUB_REF_NAME:-v1.4.1}")
 GO_LDFLAGS="-s -w -X main.VERSION=${GITVER}"
 DIST_DIR="${DIST_DIR:-${__root}/dist}"
 
