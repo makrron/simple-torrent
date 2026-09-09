@@ -6,7 +6,7 @@ This document describes the design, architecture, and extension guidelines for *
 
 ## 📌 Architecture Overview
 
-SimpleTorrent features a modular, high-performance torrent search engine located in the [`search/`](file:///home/makrron/Documentos/github-repos/simple-torrent/search) package:
+SimpleTorrent features a modular, high-performance torrent search engine located in the `search/` package:
 
 ```
 search/
@@ -29,7 +29,7 @@ search/
 ```
 
 ### Key Capabilities & Modernizations
-1. **Zero Monoliths**: Every search site is defined in its own modular file under [`search/providers/<id>.json`](file:///home/makrron/Documentos/github-repos/simple-torrent/search/providers/). Adding a new site requires editing **only one file**.
+1. **Zero Monoliths**: Every search site is defined in its own modular file under `search/providers/<id>.json`. Adding a new site requires editing **only one file**.
 2. **Compile-time Embedding**: Provider definitions are embedded directly into the Go binary via Go 1.16+ `embed.FS`. No runtime external files are required, but external overrides remain supported via `ScraperURL`.
 3. **Dual Engine (HTML + JSON APIs)**:
    - **HTML Web Scraping**: Powered by `goquery` with jQuery-style CSS selectors, attribute extraction, regex extraction, and fallback selectors.
@@ -38,8 +38,7 @@ search/
 5. **Modern Browser Fingerprint**:
    - Modern rotating desktop User-Agents (Chrome 128+, Firefox 129+).
    - Realistic Client Hints (`sec-ch-ua`, `Sec-Fetch-Dest`, `Sec-Fetch-Mode`, `Accept-Language`).
-   - Built-in Gzip/Deflate decompression.
-   - InsecureSkipVerify for TLS proxies and self-signed mirror certificates.
+   - Strict TLS certificate verification with system root CAs.
    - Safe per-request context timeouts (15s) to avoid UI blocking.
 6. **100% Backward Compatible**: Retains complete compatibility with the SimpleTorrent Angular web UI and legacy `scraper-config.json` specifications.
 
@@ -47,7 +46,7 @@ search/
 
 ## 🛠️ Provider Definition Schema
 
-Each provider definition in [`search/providers/`](file:///home/makrron/Documentos/github-repos/simple-torrent/search/providers/) is a JSON file conforming to the following structure:
+Each provider definition in `search/providers/` is a JSON file conforming to the following structure:
 
 ### 1. HTML Web Scraping Provider (`type: "html"`)
 

@@ -1,20 +1,8 @@
 package server
 
 import (
-	"crypto/tls"
-	"net/http"
 	"strings"
 )
-
-func init() {
-	if tr, ok := http.DefaultTransport.(*http.Transport); ok {
-		if tr.TLSClientConfig == nil {
-			tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-		} else {
-			tr.TLSClientConfig.InsecureSkipVerify = true
-		}
-	}
-}
 
 func (s *Server) fetchSearchConfig(confurl string) error {
 	if !strings.HasPrefix(confurl, "http://") && !strings.HasPrefix(confurl, "https://") {

@@ -3,7 +3,6 @@ package search
 import (
 	"compress/gzip"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"math/rand"
@@ -46,9 +45,6 @@ func NewHTTPClient(proxyURL string, timeout time.Duration) *HTTPClient {
 		TLSHandshakeTimeout:   5 * time.Second,
 		ResponseHeaderTimeout: 7 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true,
-		},
 	}
 
 	if proxyURL != "" {
