@@ -62,6 +62,10 @@ func ExtractHTMLItemDetail(htmlData []byte, fieldRules map[string]interface{}) (
 		Tracker:  extractField(root, fieldRules["tracker"]),
 	}
 
+	if detail.Magnet == "" && detail.InfoHash != "" {
+		detail.Magnet = BuildMagnetURI(detail.InfoHash, "", DefaultTrackers)
+	}
+
 	return detail, nil
 }
 

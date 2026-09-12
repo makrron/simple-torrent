@@ -24,6 +24,7 @@ search/
     ├── limetorrents.json
     ├── nyaa.json
     ├── tpb.json
+    ├── torrentclaw.json
     ├── torrentgalaxy.json
     └── yts.json
 ```

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -16,7 +17,7 @@ func TestEngine_EmbeddedProviders(t *testing.T) {
 		Debug:   false,
 	})
 
-	expectedProviders := []string{"tpb", "yts", "nyaa", "1337x", "eztv", "lt", "abb", "torrentgalaxy"}
+	expectedProviders := []string{"tpb", "yts", "nyaa", "1337x", "eztv", "lt", "abb", "torrentgalaxy", "torrentclaw"}
 	for _, id := range expectedProviders {
 		p, exists := engine.GetProvider(id)
 		if !exists {
@@ -167,6 +168,101 @@ func (r *Result) MagnetStartsWith(prefix string) bool {
 	return len(r.Magnet) >= len(prefix) && r.Magnet[:len(prefix)] == prefix
 }
 
+func TestExtractJSONResults_NestedTorrentClaw(t *testing.T) {
+	jsonContent := `{
+		"total": 1,
+		"results": [
+			{
+				"id": 67092,
+				"title": "Arrival",
+				"contentUrl": "/movies/arrival-2016-67092",
+				"torrents": [
+					{
+						"rawTitle": "Arrival.2016.UHD.2160p.BluRay.x265.HDR.DTS-HFMA.7.1-DTOne",
+						"magnetUrl": "magnet:?xt=urn:btih:d0f7925fcba5ed1fbf8b1916533147fd0dccde6a&dn=Arrival",
+						"torrentUrl": "/api/v1/torrent/d0f7925fcba5ed1fbf8b1916533147fd0dccde6a",
+						"sizeBytes": 9005906433,
+						"seeders": 158,
+						"leechers": 47,
+						"infoHash": "d0f7925fcba5ed1fbf8b1916533147fd0dccde6a"
+					}
+				]
+			}
+		]
+	}`
+
+	rules := map[string]interface{}{
+		"name":     []interface{}{"rawTitle", "_parent.title"},
+		"size":     "sizeBytes",
+		"seeds":    "seeders",
+		"peers":    "leechers",
+		"magnet":   "magnetUrl",
+		"torrent":  "torrentUrl",
+		"infohash": "infoHash",
+		"path":     "_parent.contentUrl",
+	}
+
+	results, err := ExtractJSONResults([]byte(jsonContent), "results.*.torrents", rules)
+	if err != nil {
+		t.Fatalf("unexpected error extracting TorrentClaw JSON: %v", err)
+	}
+
+	if len(results) != 1 {
+		t.Fatalf("expected 1 result, got %d", len(results))
+	}
+
+	r := results[0]
+	if r.Name != "Arrival.2016.UHD.2160p.BluRay.x265.HDR.DTS-HFMA.7.1-DTOne" {
+		t.Errorf("unexpected name: %s", r.Name)
+	}
+	if r.Size != "8.39 GB" {
+		t.Errorf("expected size '8.39 GB', got '%s'", r.Size)
+	}
+	if r.Seeds != "158" {
+		t.Errorf("expected seeds '158', got '%s'", r.Seeds)
+	}
+	if r.Peers != "47" {
+		t.Errorf("expected peers '47', got '%s'", r.Peers)
+	}
+	if r.InfoHash != "d0f7925fcba5ed1fbf8b1916533147fd0dccde6a" {
+		t.Errorf("expected infohash 'd0f7925fcba5ed1fbf8b1916533147fd0dccde6a', got '%s'", r.InfoHash)
+	}
+	if !r.MagnetStartsWith("magnet:?xt=urn:btih:d0f7925fcba5ed1fbf8b1916533147fd0dccde6a") {
+		t.Errorf("unexpected magnet URL: %s", r.Magnet)
+	}
+	if r.Path != "/movies/arrival-2016-67092" {
+		t.Errorf("expected path '/movies/arrival-2016-67092', got '%s'", r.Path)
+	}
+}
+
+func TestExtractHTMLItemDetail_TorrentClaw(t *testing.T) {
+	htmlContent := `
+	<html>
+	<body>
+		<div id="torrent-d0f7925fcba5ed1fbf8b1916533147fd0dccde6a" data-torrent-hash="d0f7925fcba5ed1fbf8b1916533147fd0dccde6a">
+			<button>Download</button>
+		</div>
+	</body>
+	</html>
+	`
+
+	rules := map[string]interface{}{
+		"infohash": []interface{}{"div[data-torrent-hash]", "@data-torrent-hash"},
+	}
+
+	detail, err := ExtractHTMLItemDetail([]byte(htmlContent), rules)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if detail.InfoHash != "d0f7925fcba5ed1fbf8b1916533147fd0dccde6a" {
+		t.Errorf("expected infohash 'd0f7925fcba5ed1fbf8b1916533147fd0dccde6a', got '%s'", detail.InfoHash)
+	}
+	if detail.Magnet == "" || !strings.HasPrefix(detail.Magnet, "magnet:?xt=urn:btih:d0f7925fcba5ed1fbf8b1916533147fd0dccde6a") {
+		t.Errorf("expected auto-constructed magnet link, got: %s", detail.Magnet)
+	}
+}
+
 func TestProvider_MirrorFallback(t *testing.T) {
 	// Server 1 (fails with 500)
 	s1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -308,6 +404,7 @@ func TestLiveProvidersAudit(t *testing.T) {
 		"lt":            "ubuntu",
 		"abb":           "ubuntu",
 		"torrentgalaxy": "ubuntu",
+		"torrentclaw":   "la llegada",
 	}
 
 	for id, query := range queryMap {

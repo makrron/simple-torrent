@@ -20,23 +20,27 @@ var DefaultTrackers = []string{
 }
 
 // ExtractJSONResults parses a JSON response and returns search Results.
+// It supports direct arrays as well as nested array extraction (e.g. "results.*.torrents").
 func ExtractJSONResults(data []byte, rootPath string, fieldRules map[string]interface{}) ([]Result, error) {
 	var raw interface{}
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON: %w", err)
 	}
 
-	targetNode := raw
-	if rootPath != "" {
-		parts := strings.Split(rootPath, ".")
-		for _, part := range parts {
-			if m, ok := targetNode.(map[string]interface{}); ok {
-				targetNode = m[part]
-			} else {
-				targetNode = nil
-				break
-			}
-		}
+	// Check if rootPath indicates nested extraction (e.g. "results.*.torrents" or "results[].torrents")
+	parentPath := rootPath
+	childPath := ""
+	if idx := strings.Index(rootPath, ".*."); idx != -1 {
+		parentPath = rootPath[:idx]
+		childPath = rootPath[idx+3:]
+	} else if idx := strings.Index(rootPath, "[]."); idx != -1 {
+		parentPath = rootPath[:idx]
+		childPath = rootPath[idx+3:]
+	}
+
+	targetNode := navigateJSONNode(raw, parentPath)
+	if targetNode == nil {
+		return []Result{}, nil
 	}
 
 	itemsSlice, ok := targetNode.([]interface{})
@@ -46,89 +50,126 @@ func ExtractJSONResults(data []byte, rootPath string, fieldRules map[string]inte
 
 	results := make([]Result, 0, len(itemsSlice))
 	for _, item := range itemsSlice {
-		itemMap, ok := item.(map[string]interface{})
+		parentMap, ok := item.(map[string]interface{})
 		if !ok {
 			continue
 		}
 
-		res := Result{
-			Name:     extractJSONField(itemMap, fieldRules["name"]),
-			Size:     extractJSONField(itemMap, fieldRules["size"]),
-			Seeds:    extractJSONField(itemMap, fieldRules["seeds"]),
-			Peers:    extractJSONField(itemMap, fieldRules["peers"]),
-			Magnet:   extractJSONField(itemMap, fieldRules["magnet"]),
-			Torrent:  extractJSONField(itemMap, fieldRules["torrent"]),
-			URL:      extractJSONField(itemMap, fieldRules["url"]),
-			Path:     extractJSONField(itemMap, fieldRules["path"]),
-			InfoHash: extractJSONField(itemMap, fieldRules["infohash"]),
-			Date:     extractJSONField(itemMap, fieldRules["date"]),
-			Category: extractJSONField(itemMap, fieldRules["category"]),
+		if childPath != "" {
+			childNode := navigateJSONNode(parentMap, childPath)
+			if childSlice, isSlice := childNode.([]interface{}); isSlice && len(childSlice) > 0 {
+				for _, childItem := range childSlice {
+					childMap, isChildMap := childItem.(map[string]interface{})
+					if !isChildMap {
+						continue
+					}
+					if res := buildJSONResult(childMap, parentMap, fieldRules); res != nil {
+						results = append(results, *res)
+					}
+				}
+				continue
+			}
 		}
 
-		// If infohash rule was named "hash" in result config
-		if res.InfoHash == "" && fieldRules["hash"] != nil {
-			res.InfoHash = extractJSONField(itemMap, fieldRules["hash"])
-		}
-
-		// Auto construct magnet if only infohash is present
-		if res.Magnet == "" && res.InfoHash != "" {
-			res.Magnet = BuildMagnetURI(res.InfoHash, res.Name, DefaultTrackers)
-		}
-
-		if res.Name != "" || res.Magnet != "" || res.Torrent != "" || res.InfoHash != "" {
-			results = append(results, res)
+		if res := buildJSONResult(parentMap, nil, fieldRules); res != nil {
+			results = append(results, *res)
 		}
 	}
 
 	return results, nil
 }
 
-// extractJSONField retrieves a value by dot-notation path from a map.
-func extractJSONField(item map[string]interface{}, rule interface{}) string {
+func buildJSONResult(item map[string]interface{}, parent map[string]interface{}, fieldRules map[string]interface{}) *Result {
+	res := Result{
+		Name:     extractJSONField(item, parent, fieldRules["name"]),
+		Size:     extractJSONField(item, parent, fieldRules["size"]),
+		Seeds:    extractJSONField(item, parent, fieldRules["seeds"]),
+		Peers:    extractJSONField(item, parent, fieldRules["peers"]),
+		Magnet:   extractJSONField(item, parent, fieldRules["magnet"]),
+		Torrent:  extractJSONField(item, parent, fieldRules["torrent"]),
+		URL:      extractJSONField(item, parent, fieldRules["url"]),
+		Path:     extractJSONField(item, parent, fieldRules["path"]),
+		InfoHash: extractJSONField(item, parent, fieldRules["infohash"]),
+		Date:     extractJSONField(item, parent, fieldRules["date"]),
+		Category: extractJSONField(item, parent, fieldRules["category"]),
+	}
+
+	// If infohash rule was named "hash" in result config
+	if res.InfoHash == "" && fieldRules["hash"] != nil {
+		res.InfoHash = extractJSONField(item, parent, fieldRules["hash"])
+	}
+
+	// Auto format size if numeric byte count (e.g. 9005906433 -> 8.39 GB)
+	if sizeBytes, err := strconv.ParseInt(res.Size, 10, 64); err == nil && sizeBytes > 1024 {
+		res.Size = FormatBytes(sizeBytes)
+	}
+
+	// Auto construct magnet if only infohash is present
+	if res.Magnet == "" && res.InfoHash != "" {
+		res.Magnet = BuildMagnetURI(res.InfoHash, res.Name, DefaultTrackers)
+	}
+
+	if res.Name != "" || res.Magnet != "" || res.Torrent != "" || res.InfoHash != "" || res.Path != "" {
+		return &res
+	}
+	return nil
+}
+
+// extractJSONField retrieves a value by dot-notation path or slice of paths with parent fallback.
+func extractJSONField(item map[string]interface{}, parent map[string]interface{}, rule interface{}) string {
 	if rule == nil {
 		return ""
 	}
 
-	path, ok := rule.(string)
-	if !ok {
-		return ""
-	}
-
-	parts := strings.Split(path, ".")
-	var current interface{} = item
-
-	for _, part := range parts {
-		if current == nil {
-			return ""
-		}
-
-		// Check if part is an array index
-		if idx, err := strconv.Atoi(part); err == nil {
-			if arr, ok := current.([]interface{}); ok {
-				if idx >= 0 && idx < len(arr) {
-					current = arr[idx]
-					continue
+	switch v := rule.(type) {
+	case string:
+		return extractSingleJSONField(item, parent, v)
+	case []interface{}:
+		for _, p := range v {
+			if s, ok := p.(string); ok {
+				if val := extractSingleJSONField(item, parent, s); val != "" {
+					return val
 				}
 			}
-			return ""
 		}
-
-		if m, ok := current.(map[string]interface{}); ok {
-			current = m[part]
-		} else {
-			return ""
+		return ""
+	case []string:
+		for _, s := range v {
+			if val := extractSingleJSONField(item, parent, s); val != "" {
+				return val
+			}
 		}
+		return ""
+	default:
+		return ""
 	}
+}
 
-	if current == nil {
+func extractSingleJSONField(item map[string]interface{}, parent map[string]interface{}, path string) string {
+	path = strings.TrimSpace(path)
+	if path == "" {
 		return ""
 	}
 
-	switch v := current.(type) {
+	target := item
+	if strings.HasPrefix(path, "_parent.") {
+		target = parent
+		path = strings.TrimPrefix(path, "_parent.")
+	}
+
+	if target == nil {
+		return ""
+	}
+
+	node := navigateJSONNode(target, path)
+	if node == nil {
+		return ""
+	}
+
+	switch v := node.(type) {
 	case string:
 		return strings.TrimSpace(v)
 	case float64:
-		// Check if whole integer
 		if v == float64(int64(v)) {
 			return strconv.FormatInt(int64(v), 10)
 		}
@@ -143,6 +184,53 @@ func extractJSONField(item map[string]interface{}, rule interface{}) string {
 		b, _ := json.Marshal(v)
 		return string(b)
 	}
+}
+
+func navigateJSONNode(root interface{}, path string) interface{} {
+	if path == "" || root == nil {
+		return root
+	}
+
+	parts := strings.Split(path, ".")
+	current := root
+
+	for _, part := range parts {
+		if current == nil {
+			return nil
+		}
+
+		if idx, err := strconv.Atoi(part); err == nil {
+			if arr, ok := current.([]interface{}); ok {
+				if idx >= 0 && idx < len(arr) {
+					current = arr[idx]
+					continue
+				}
+			}
+			return nil
+		}
+
+		if m, ok := current.(map[string]interface{}); ok {
+			current = m[part]
+		} else {
+			return nil
+		}
+	}
+
+	return current
+}
+
+// FormatBytes formats byte count into human-readable string (e.g. "8.39 GB")
+func FormatBytes(b int64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit && exp < 5; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.2f %cB", float64(b)/float64(div), "KMGTPE"[exp])
 }
 
 // BuildMagnetURI creates a magnet link from infohash, name, and trackers.

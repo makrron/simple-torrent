@@ -3,6 +3,7 @@ package search
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -64,7 +65,15 @@ func (p *ProviderConfig) GetItemURLs(itemPath string) []string {
 
 func formatURL(rawURL string, query string, page int) string {
 	res := rawURL
-	res = strings.ReplaceAll(res, "{{query}}", query)
+	escapedQuery := query
+	if strings.Contains(res, "{{query}}") {
+		if strings.Contains(res, "?") {
+			escapedQuery = url.QueryEscape(query)
+		} else if strings.Contains(escapedQuery, " ") {
+			escapedQuery = strings.ReplaceAll(escapedQuery, " ", "+")
+		}
+		res = strings.ReplaceAll(res, "{{query}}", escapedQuery)
+	}
 
 	// Handle page substitution
 	// {{page:0}} means 0-indexed page

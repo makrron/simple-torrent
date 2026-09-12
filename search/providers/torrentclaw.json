@@ -1,0 +1,33 @@
+{
+  "id": "torrentclaw",
+  "name": "TorrentClaw",
+  "type": "json",
+  "url": "https://torrentclaw.com/api/v1/search?q={{query}}&page={{page:1}}",
+  "mirrors": [
+    "https://torrentclaw.com/api/v1/search?q={{query}}&page={{page:1}}"
+  ],
+  "root": "results.*.torrents",
+  "result": {
+    "name": [
+      "rawTitle",
+      "_parent.title"
+    ],
+    "size": "sizeBytes",
+    "seeds": "seeders",
+    "peers": "leechers",
+    "magnet": "magnetUrl",
+    "torrent": "torrentUrl",
+    "infohash": "infoHash",
+    "path": "_parent.contentUrl"
+  },
+  "item_url": "https://torrentclaw.com{{item}}",
+  "item_mirrors": [
+    "https://torrentclaw.com{{item}}"
+  ],
+  "item_result": {
+    "infohash": [
+      "div[data-torrent-hash]",
+      "@data-torrent-hash"
+    ]
+  }
+}
